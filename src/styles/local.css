@@ -1,0 +1,7 @@
+/* Small interaction fixes around the extracted source stylesheet. */
+button { font-family: inherit; }
+.rbtn .rcost { pointer-events: none; }
+#stage canvas { cursor: default; }
+body:has(.rbtn.is-on) #stage canvas { cursor: crosshair; }
+#over:not(.is-on) { pointer-events: none; }
+body.has-card #feetip, body.has-card #droptip { opacity: 0; pointer-events: none; }

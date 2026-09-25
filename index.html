@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <!--
+      What the search results and the share previews say.
+
+      Google was quoting the cookie banner, because the page offered it nothing better: no
+      description, no share card, no icon. A crawler takes the first readable sentence it
+      finds, and after the consent notice went in, that sentence was the consent notice.
+
+      The title carries a descriptor because "Don't Look Up" alone belongs to a film. The
+      description is the game's own opening line rather than copy written for robots.
+    -->
+    <title>Don't Look Up — a game about keeping everyone looking down</title>
+    <meta name="description" content="You are very rich, very tall, and standing on quite a lot of people. Keep them distracted and they keep paying. Let them look up, and they push you over." />
+    <link rel="canonical" href="https://www.dontlookup.app/" />
+    <meta name="theme-color" content="#f4f3ef" />
+
+    <!-- The coin, which is the thing the whole game is about collecting. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Slack, WhatsApp, iMessage, LinkedIn and the rest all read these. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Don't Look Up" />
+    <meta property="og:url" content="https://www.dontlookup.app/" />
+    <meta property="og:title" content="Don't Look Up — a game about keeping everyone looking down" />
+    <meta property="og:description" content="You are very rich, very tall, and standing on quite a lot of people. Keep them distracted and they keep paying. Let them look up, and they push you over." />
+    <meta property="og:image" content="https://www.dontlookup.app/assets/brand/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="DON'T LOOK UP, in heavy black type on off-white paper, with dollar coins scattered around it." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Don't Look Up — a game about keeping everyone looking down" />
+    <meta name="twitter:description" content="You are very rich, very tall, and standing on quite a lot of people. Keep them distracted and they keep paying. Let them look up, and they push you over." />
+    <meta name="twitter:image" content="https://www.dontlookup.app/assets/brand/og.jpg" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "VideoGame",
+        "name": "Don't Look Up",
+        "url": "https://www.dontlookup.app/",
+        "description": "You are very rich, very tall, and standing on quite a lot of people. Keep them distracted and they keep paying. Let them look up, and they push you over.",
+        "image": "https://www.dontlookup.app/assets/brand/og.jpg",
+        "genre": ["Strategy", "Satire"],
+        "gamePlatform": "Web browser",
+        "applicationCategory": "Game",
+        "operatingSystem": "Any",
+        "inLanguage": "en",
+        "isAccessibleForFree": true
+      }
+    </script>
+
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <div id="stage"></div>
+    <div id="bubbles"></div>
+
+    <div id="alarm"></div>
+    <div id="alarmtext">they are organising</div>
+
+    <div id="top">
+      <div id="ledger">
+        <div id="money">$0</div>
+        <div id="rate">&mdash;</div>
+        <div id="bar"><i></i></div>
+        <div id="goal">target &nbsp;$1 trillion</div>
+        <div id="meta">
+          <div class="mcell">
+            <div id="time">0:00</div>
+            <!-- Counting up. It is the score, not a deadline — see economy.elapsed. -->
+            <div class="lbl">elapsed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="card">
+      <img id="card-art" alt="" hidden />
+      <div id="card-body">
+        <div id="card-kicker">a distraction</div>
+        <div id="card-title"></div>
+        <div id="card-line"></div>
+        <!-- Only the magnifier fills this: how long it has left, and how many it holds. -->
+        <div id="card-note" hidden></div>
+        <!-- What the yellows mean, with how many of each are inside this thing's reach. -->
+        <div id="card-legend" hidden><div class="legend"><span class="lrow"><i class="lsw sw3"></i>looking up<b class="lct"></b></span><span class="lrow"><i class="lsw sw1"></i>recruiting others<b class="lct"></b></span></div></div>
+        <div id="card-meter" hidden>
+          <i id="card-fill"></i>
+          <span id="card-stages"><i id="cs-up"></i><i id="cs-recruit"></i></span>
+        </div>
+      </div>
+    </div>
+
+    <div id="dock">
+      <div id="menu" hidden></div>
+
+      <!-- The fee, and what the clock says the fee ought to be. -->
+      <div id="feepanel">
+        <div id="fee-head">
+          <div>
+            <div id="fee">5%</div>
+            <div class="lbl">fee</div>
+          </div>
+          <div id="feebtns">
+            <button class="btn" id="btn-down" title="Lower the fee">&minus;</button>
+            <button class="btn" id="btn-up" title="Raise the fee">+</button>
+          </div>
+        </div>
+        <div id="fee-track"><i id="fee-fill"></i><u id="fee-need"></u></div>
+        <div id="fee-note">working it out&hellip;</div>
+        <div id="feetip" role="status"><span class="tt"></span><svg class="ttail" viewBox="-3 -5 18 14" aria-hidden="true"><path class="ttail-fill" d="M0 -5H12V-1.25L6 6 0 -1.25Z"/><path class="ttail-line" d="M0 -1.25 6 6 12 -1.25"/></svg></div>
+      </div>
+
+      <!--
+        Inspect. Not a third mode: nothing armed IS inspecting, so this is the control that
+        puts down whatever you are holding. It shows as pressed while your hands are empty.
+      -->
+      <button id="inspect" title="Inspect the crowd" aria-label="Inspect the crowd">
+        <img class="micon" src="/assets/brand/cursor_lens.png" alt="" />
+      </button>
+      <!--
+        The rail. Desktop only: every distraction on the bar at once, as icons the size of
+        the inspect lens, in the three families with a gap between them. The menu below still
+        exists and is what a phone uses — there is no room for nine targets on a handset, and
+        no hover to explain them with.
+      -->
+      <div id="rail" hidden></div>
+
+      <button id="launch">
+        <span id="launch-glyph"><img class="micon" src="/assets/brand/icon_launch.png" alt="" /></span>
+        <span id="launch-text">Plant a distraction</span>
+        <span id="launch-key">space</span>
+      </button>
+      <!-- Anchored to the dock, so it lands beside the button it is talking about. -->
+      <div id="droptip" role="status"><span class="tt"></span><svg class="ttail" viewBox="-3 -5 18 14" aria-hidden="true"><path class="ttail-fill" d="M0 -5H12V-1.25L6 6 0 -1.25Z"/><path class="ttail-line" d="M0 -1.25 6 6 12 -1.25"/></svg></div>
+    </div>
+
+    <!--
+      What an icon actually is: the art, the name, and the line saying what it LEAVES
+      BEHIND — which for the three influencers is the only thing telling them apart.
+    -->
+    <div id="railcard" hidden>
+      <img id="rc-art" alt="" />
+      <div id="rc-body">
+        <div id="rc-head"><span id="rc-name"></span><span id="rc-effect"></span></div>
+        <div id="rc-blurb"></div>
+        <div id="rc-tag"></div>
+        <!-- Both only ever seen on a phone: on a desktop the price is under the icon and the
+             icon itself is the button. -->
+        <div id="rc-foot"><span id="rc-cost"></span><button id="rc-place" type="button">Place it</button></div>
+      </div>
+      <svg class="ttail" viewBox="-3 -5 18 14" aria-hidden="true">
+        <path class="ttail-fill" d="M0 -5H12V-1.25L6 6 0 -1.25Z"/>
+        <path class="ttail-line" d="M0 -1.25 6 6 12 -1.25"/>
+      </svg>
+    </div>
+
+    <!-- Two drawn marks, one shown at a time: the "i" of a display face is a bar with a
+         dot and reads as nothing, so the icon is drawn. -->
+    <button id="help" title="Pause and read the tutorial" aria-label="Pause and read the tutorial">
+      <!-- A pause mark, not an "i": opening this stops the clock, so it should say so. -->
+      <svg class="hicon hicon-i" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9.2" />
+        <path d="M9.7 8.6v6.8M14.3 8.6v6.8" />
+      </svg>
+      <svg class="hicon hicon-x" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6.4 6.4 17.6 17.6M17.6 6.4 6.4 17.6" />
+      </svg>
+    </button>
+
+    <div id="hud">
+      <div class="meter">
+        <!-- One fill. Full means over. -->
+        <i id="m-up"></i>
+        <span class="mtxt">at your feet <b id="hud-awake">0</b></span>
+      </div>
+      <!-- The same key, over the bar, while the pointer rests on it. -->
+      <div id="bar-legend"><div class="legend"><span class="lrow"><i class="lsw sw3"></i>looking up<b class="lct"></b></span><span class="lrow"><i class="lsw sw1"></i>recruiting others<b class="lct"></b></span></div></div>
+    </div>
+
+    <div id="hint">
+yellow means they have noticed &mdash; drop it on them<br />
+      space menu &middot; 1&ndash;9 pick &middot; esc cancel &middot; &uarr;&darr; fee
+    </div>
+
+    <!--
+      Who the type belongs to, and where to get it. One link, on "here" — the credit is a
+      sentence rather than a banner, and a reader who wants the fonts will follow the word that
+      offers them. Opens away from the game, so a run is never lost to a click on a credit.
+    -->
+    <div id="credit">Made with FGD fonts, download <a href="https://fgdesigners.xyz/" target="_blank" rel="noopener noreferrer">here</a></div>
+
+    <!--
+      The cookie question. Hidden by default and only ever revealed by src/analytics.js —
+      on localhost and on the preview deployments nothing is tracked, so there is nothing
+      to ask about and the card never appears at all.
+    -->
+    <div id="consent" hidden>
+      <p>
+        We count runs, not people. Anonymously, through Google Analytics,
+        and only if you say yes.
+      </p>
+      <div id="consent-btns">
+        <button id="consent-yes">Count me</button>
+        <button id="consent-no">No thanks</button>
+      </div>
+    </div>
+
+    <!-- The title, over the living scene. No art of its own: the game IS the backdrop,
+         and the camera is doing the work behind this. -->
+    <div id="intro">
+      <img id="intro-word" src="/assets/brand/wordmark.png" alt="Don't Look Up" />
+      <div id="intro-line">You are very rich, very tall, and standing on quite a lot of people.</div>
+      <div id="intro-btns">
+        <button id="intro-start">Start</button>
+        <button id="intro-how">Tutorial</button>
+      </div>
+    </div>
+
+    <!-- Three steps, skippable, over the same moving scene. -->
+    <div id="steps" hidden>
+      <div id="step-card">
+        <!--
+          The picture, with the game's own controls laid over it. A tutorial that draws the
+          fee bar and the distraction icons is showing you the thing you are about to touch,
+          rather than an illustration of it.
+        -->
+        <div id="step-visual">
+          <img id="step-art" alt="" />
+
+          <!--
+            The colour key, shown only on its own step, and it REPLACES the picture rather
+            than sitting under it. Swatches drawn here rather than supplied as an image, so
+            they are the exact colours the crowd is tinted with and cannot drift.
+          -->
+          <div id="step-key" hidden>
+            <span class="krow"><img class="kfig" src="/assets/steps/new_yellow.png" alt="" /><span><b>Yellow</b> has noticed. Pays nothing, talks the others round, and walks to your feet.</span></span>
+            <span class="krow"><img class="kfig" src="/assets/steps/new_blue.png" alt="" /><span><b>Blue</b> believes. Pays you best, and cannot be argued back.</span></span>
+            <span class="krow"><img class="kfig" src="/assets/steps/new_red.png" alt="" /><span><b>Red</b> is arguing. Still pays, and drifts away from your feet.</span></span>
+          </div>
+        </div>
+        <!--
+          Anything the card SHOWS rather than illustrates lives here, under the picture. It
+          used to sit on top of it, which covered the part of the drawing the card was
+          about. The row keeps its height on every step so the panel does not resize.
+        -->
+        <div id="step-extras">
+          <div id="step-fee" hidden>
+            <span class="sf-pct">5%</span>
+            <div class="sf-track"><i class="sf-fill"></i><u class="sf-need"></u></div>
+            <span class="sf-plus" aria-hidden="true">+</span>
+          </div>
+          <div id="step-icons" hidden></div>
+        </div>
+        <div id="step-num">1 of 3</div>
+        <div id="step-title"></div>
+        <div id="step-line"></div>
+        <div id="step-btns">
+          <button id="step-skip">Play</button>
+          <button id="step-next">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="over">
+      <!-- The title is art, and it lives OUTSIDE the box so it can be as big as it likes. -->
+      <img id="over-art" alt="" hidden />
+      <div id="over-title" hidden></div>
+      <div id="over-line"></div>
+      <div id="over-sum"></div>
+      <!-- One row. Share joins it on a win and is hidden otherwise, so the pair is always
+           the same shape and nothing reflows underneath the player's thumb. -->
+      <div id="over-buttons">
+        <button id="polaroid-share" type="button" hidden>Share</button>
+        <button id="over-again">Play again</button>
+      </div>
+      <!-- The souvenir, on a win only. Filled and revealed by main.js; tapping the backdrop
+           puts it away, and the buttons sit above it either way. -->
+      <div id="polaroid-wrap" hidden>
+        <figure id="polaroid">
+          <img id="polaroid-img" alt="The crowd, where they stood when the trillion landed" />
+        </figure>
+      </div>
+    </div>
+
+    <!--
+      Touch has no cursor, so an armed distraction has nothing following the finger to say
+      what is about to happen. This says it instead, with the thing itself on the left.
+    -->
+    <div id="tapaway" hidden aria-live="polite">
+      <img id="tapaway-icon" src="" alt="" />
+      <span id="tapaway-text">Tap anywhere to place it</span>
+    </div>
+
+    <!-- One life bar per standing tower, parked over its head by main.js. No text: the
+         only question it answers is "how long have I got", and a bar answers that faster
+         than a number does. Pointer-events off — it must never eat a click on the field. -->
+    <div id="tbars" aria-hidden="true"></div>
+
+    <!-- Beat three of the lesson, parked over the crowd by main.js. -->
+    <div id="aimtip" role="status"><span class="tt"></span><svg class="ttail" viewBox="-3 -5 18 14" aria-hidden="true"><path class="ttail-fill" d="M0 -5H12V-1.25L6 6 0 -1.25Z"/><path class="ttail-line" d="M0 -1.25 6 6 12 -1.25"/></svg></div>
+
+    <div id="loader">
+      <!-- The money piling up, which is the only thing the giant is actually doing.
+
+           Two drawings of the same coin: face on for the fall, so the $ is readable as it
+           spins down, and a solid cylinder with a visible rim for the pile. The swap
+           happens at the moment of landing. This is why the coins are drawn rather than
+           CSS-transformed: a flat image tilted in 3D shows a squashed FACE, not an edge —
+           it has no thickness to show. The thickness is in the art.
+
+           Pure CSS: this plays while the main thread is parsing the game and decoding three
+           glTF files, so nothing here may depend on script, and only transforms and
+           opacity animate. -->
+      <div id="pile" aria-hidden="true">
+        <span class="coin" style="--x:-94px; --h:0; --z:14px; --spin:-160deg; --tilt:-5deg; --d:0.00s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:-47px; --h:0; --z:-6px; --spin:-89deg; --tilt:0deg; --d:0.13s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:0px; --h:0; --z:18px; --spin:-18deg; --tilt:5deg; --d:0.26s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:47px; --h:0; --z:-10px; --spin:53deg; --tilt:-1deg; --d:0.39s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:94px; --h:0; --z:6px; --spin:124deg; --tilt:4deg; --d:0.52s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:-94px; --h:1; --z:14px; --spin:-117deg; --tilt:-5deg; --d:0.65s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:-47px; --h:1; --z:-6px; --spin:-46deg; --tilt:0deg; --d:0.78s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:0px; --h:1; --z:18px; --spin:25deg; --tilt:5deg; --d:0.91s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:47px; --h:1; --z:-10px; --spin:96deg; --tilt:-1deg; --d:1.04s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:94px; --h:1; --z:6px; --spin:-153deg; --tilt:4deg; --d:1.17s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:-94px; --h:2; --z:14px; --spin:-74deg; --tilt:-5deg; --d:1.30s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:-47px; --h:2; --z:-6px; --spin:-3deg; --tilt:0deg; --d:1.43s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:0px; --h:2; --z:18px; --spin:68deg; --tilt:5deg; --d:1.56s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:47px; --h:2; --z:-10px; --spin:139deg; --tilt:-1deg; --d:1.69s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:94px; --h:2; --z:6px; --spin:-110deg; --tilt:4deg; --d:1.82s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:-94px; --h:3; --z:14px; --spin:-31deg; --tilt:-5deg; --d:1.95s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:-47px; --h:3; --z:-6px; --spin:40deg; --tilt:0deg; --d:2.08s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:0px; --h:3; --z:18px; --spin:111deg; --tilt:5deg; --d:2.21s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:47px; --h:3; --z:-10px; --spin:-138deg; --tilt:-1deg; --d:2.34s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+        <span class="coin" style="--x:94px; --h:3; --z:6px; --spin:-67deg; --tilt:4deg; --d:2.47s"><img class="flat" src="/assets/brand/coin.png" alt="" /><img class="solid" src="/assets/brand/coin3d.png" alt="" /></span>
+      </div>
+      <span class="dots">loading</span>
+    </div>
+
+  </body>
+</html>

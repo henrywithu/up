@@ -1,0 +1,425 @@
+{
+  "reference": "https://www.dontlookup.app/",
+  "captured": "2026-09-25",
+  "assetCount": 59,
+  "missingPublicAssets": [
+    "/assets/character.glb",
+    "/assets/anim_walk_arm.glb",
+    "/assets/anim_run_arm.glb"
+  ],
+  "assets": [
+    {
+      "path": "/assets/audio/TV.aac",
+      "url": "https://www.dontlookup.app/assets/audio/TV.aac",
+      "bytes": 263116,
+      "sha256": "7ab26ea645a9fcea32277f9d870ecacd0ed48f9953e2560d12e819631f66d2ca",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/ambient_sound.aac",
+      "url": "https://www.dontlookup.app/assets/audio/ambient_sound.aac",
+      "bytes": 6837702,
+      "sha256": "04721b518359bc6c95e5d36632dca577fe4e961275832e4d0d326ce1e224b6d6",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/cat.aac",
+      "url": "https://www.dontlookup.app/assets/audio/cat.aac",
+      "bytes": 33122,
+      "sha256": "4d61b3c1cba840ff86be17b230daf94f1e280c5b204a773ccc5b606fdc31534b",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/church_sound2.aac",
+      "url": "https://www.dontlookup.app/assets/audio/church_sound2.aac",
+      "bytes": 38311,
+      "sha256": "fa275f1974c40380c93c3f09b5c2421a3813c813557a8f1e91ec6e6de9708e56",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/crowd_celebration.aac",
+      "url": "https://www.dontlookup.app/assets/audio/crowd_celebration.aac",
+      "bytes": 161654,
+      "sha256": "680e989e40b65ff7a013909c873ff393bc42054394a4549197ec4c50d7e5ec96",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/finance_guru.aac",
+      "url": "https://www.dontlookup.app/assets/audio/finance_guru.aac",
+      "bytes": 47750,
+      "sha256": "354da8c3eda5226b0eef3701919d3ed20958bfaf0f51a4bc199dd0c8456996a1",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/football.aac",
+      "url": "https://www.dontlookup.app/assets/audio/football.aac",
+      "bytes": 59420,
+      "sha256": "ecc29ed6c3e92269174c8733f1b74b78e2069a519872a98c2b3a4ea320b5813f",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/hat_shirt_crowd_sound.aac",
+      "url": "https://www.dontlookup.app/assets/audio/hat_shirt_crowd_sound.aac",
+      "bytes": 568819,
+      "sha256": "121f64053da629e66bb29619b0cbc95fb6c5727440c3a60ddbb114659df1dc62",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/hat_shirt_sound_intro.aac",
+      "url": "https://www.dontlookup.app/assets/audio/hat_shirt_sound_intro.aac",
+      "bytes": 57943,
+      "sha256": "dd7a51294358b582ffa97d415751279bf1508f6adedaf63eb123f7ea2fc4c063",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/outoftime.aac",
+      "url": "https://www.dontlookup.app/assets/audio/outoftime.aac",
+      "bytes": 76396,
+      "sha256": "c3ed3674001d4ba033ef0217ab31177b9e44ab3b28391ca976eba482625d7508",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/panic_music.aac",
+      "url": "https://www.dontlookup.app/assets/audio/panic_music.aac",
+      "bytes": 1892579,
+      "sha256": "ae0060b539808c43f32e94632a5a2847f6cfadebf44123044942ab139ffa9faf",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/politician_new.aac",
+      "url": "https://www.dontlookup.app/assets/audio/politician_new.aac",
+      "bytes": 96580,
+      "sha256": "9179574c930e1a917eedbaf2f97826e0ad5a50f3f00d8d1247117b52ea491dd8",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/priest.aac",
+      "url": "https://www.dontlookup.app/assets/audio/priest.aac",
+      "bytes": 619412,
+      "sha256": "08b4f5e3f101a23c3730e4fce277508ca434c897ec69224aca8b7912adc6939e",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/viral_dance.aac",
+      "url": "https://www.dontlookup.app/assets/audio/viral_dance.aac",
+      "bytes": 87236,
+      "sha256": "b2dc254d5ebdc72b2549831efa0db32573af17541b31c8ef7e1d55f305146612",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/win_final_sound.aac",
+      "url": "https://www.dontlookup.app/assets/audio/win_final_sound.aac",
+      "bytes": 162012,
+      "sha256": "d357b87ebb8a85ce118f52f1edfc614d7cf648607ccc3e54331a6743cb5379bb",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/win_music.aac",
+      "url": "https://www.dontlookup.app/assets/audio/win_music.aac",
+      "bytes": 251099,
+      "sha256": "a9b90b6dca0a7376f57d7fd88be73b4a0a6ce73c7ebc4736b248da132f40e5af",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/audio/youlose.aac",
+      "url": "https://www.dontlookup.app/assets/audio/youlose.aac",
+      "bytes": 61576,
+      "sha256": "5cc821b30251edb736075a15f21011915b1688db7066e3bf347a4a57507d39e8",
+      "type": "audio/x-aac"
+    },
+    {
+      "path": "/assets/brand/a_trillion_win.png",
+      "url": "https://www.dontlookup.app/assets/brand/a_trillion_win.png",
+      "bytes": 278806,
+      "sha256": "5b3e00c3d5551b5525db5e6f4b7635ca9d58f19071f4352cb8809a3542f49f4e",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/brand/coin.png",
+      "url": "https://www.dontlookup.app/assets/brand/coin.png",
+      "bytes": 58419,
+      "sha256": "b55c1ce8f2198efd66a0d4c08a8bd805b0ff45068c994e6c6c4787c5212de427",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/brand/coin3d.png",
+      "url": "https://www.dontlookup.app/assets/brand/coin3d.png",
+      "bytes": 40962,
+      "sha256": "28e7de2378f7e49abea99e9d5de84aa67dfacc9bf8dc1f98bf91465a9f333d5b",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/brand/cursor_lens.png",
+      "url": "https://www.dontlookup.app/assets/brand/cursor_lens.png",
+      "bytes": 4022,
+      "sha256": "dce09c004a9240377aa3643ff129ac22e08e84d9ebca112826d89ae78e179e2d",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/brand/icon_ball.png",
+      "url": "https://www.dontlookup.app/assets/brand/icon_ball.png",
+      "bytes": 16318,
+      "sha256": "596170090d269706e0c8676acbc8d9d573fab137b557b7f797f89c3aa44fabe4",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/brand/icon_cat.png",
+      "url": "https://www.dontlookup.app/assets/brand/icon_cat.png",
+      "bytes": 9624,
+      "sha256": "256c99e2bad2e1df808c09a4db454ec2ea240c43fa0a638d0b9f8763a693e594",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/brand/icon_coach.png",
+      "url": "https://www.dontlookup.app/assets/brand/icon_coach.png",
+      "bytes": 81772,
+      "sha256": "4452413467b1f004fe5970522744b92f63b21ba875eb25a79573d54b2036cbc4",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/brand/icon_dance.png",
+      "url": "https://www.dontlookup.app/assets/brand/icon_dance.png",
+      "bytes": 87224,
+      "sha256": "2937172ccf263c184f0a22ba3803e8066982396505b91700ae80cfefb1d4638b",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/brand/icon_hate_new.svg",
+      "url": "https://www.dontlookup.app/assets/brand/icon_hate_new.svg",
+      "bytes": 1385,
+      "sha256": "853d6d1ef29c12bc740e599bdd73b2d8f0defcdbe29e8dc63a2ab32e7831e29f",
+      "type": "image/svg+xml"
+    },
+    {
+      "path": "/assets/brand/icon_launch.png",
+      "url": "https://www.dontlookup.app/assets/brand/icon_launch.png",
+      "bytes": 19023,
+      "sha256": "a8669c27a31d4b6207001729c92ff378bedc1e41292f2b875b6dca98beefef48",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/brand/icon_politician.svg",
+      "url": "https://www.dontlookup.app/assets/brand/icon_politician.svg",
+      "bytes": 7307,
+      "sha256": "79526d825425496dbd7e88063b93fc16eef36d4a92cc0bede0d86252fef08c15",
+      "type": "image/svg+xml"
+    },
+    {
+      "path": "/assets/brand/icon_priest.png",
+      "url": "https://www.dontlookup.app/assets/brand/icon_priest.png",
+      "bytes": 78984,
+      "sha256": "fad33c3a1aeebfe5338a8bb9562b98a9c67383b80887830e81cac6839d0b4c5d",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/brand/icon_tv.png",
+      "url": "https://www.dontlookup.app/assets/brand/icon_tv.png",
+      "bytes": 16461,
+      "sha256": "3eaef11022ccf316ad14b7f472c2c7103d8c6a892e3393f2e84fbb11eaca4b77",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/brand/lose_title.png",
+      "url": "https://www.dontlookup.app/assets/brand/lose_title.png",
+      "bytes": 339378,
+      "sha256": "f290a5d0dd74b469394df0a8a634621fcc354cbf41f093556f66128df7970bd8",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/brand/og.jpg",
+      "url": "https://www.dontlookup.app/assets/brand/og.jpg",
+      "bytes": 45643,
+      "sha256": "5fc4c9630cc18f03d112290e6785087df65c944a62ec02a5a5b3952deca9d522",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "/assets/brand/out_of_time.png",
+      "url": "https://www.dontlookup.app/assets/brand/out_of_time.png",
+      "bytes": 454432,
+      "sha256": "c4e90aba106a3696d28d7b03e50e44b47119dd940a9be06010e35150b0a5f380",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/brand/wordmark.png",
+      "url": "https://www.dontlookup.app/assets/brand/wordmark.png",
+      "bytes": 138852,
+      "sha256": "d4c8c07eb9106071793118228f5f73739f97ab44488a1328b380768a0d37941e",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/cards/ball.jpg",
+      "url": "https://www.dontlookup.app/assets/cards/ball.jpg",
+      "bytes": 89347,
+      "sha256": "8a5ad40f79b585cd6bc0f28cd16b0d73b1c5809e3801d5c8b51a6cd42ed92f68",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "/assets/cards/cat.jpg",
+      "url": "https://www.dontlookup.app/assets/cards/cat.jpg",
+      "bytes": 77943,
+      "sha256": "8dab041150826b428708dd0b8cf775452b7dcf8baba49d2c577d69338ae12b5c",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "/assets/cards/coach.jpg",
+      "url": "https://www.dontlookup.app/assets/cards/coach.jpg",
+      "bytes": 73670,
+      "sha256": "73449da9a1e7754c5430010ecf1c66fc5e3a20edf697ebf602c1948e9d0a111e",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "/assets/cards/dance.jpg",
+      "url": "https://www.dontlookup.app/assets/cards/dance.jpg",
+      "bytes": 64688,
+      "sha256": "1cb8c2cb4d11a10fcafd146db76897c6ddbd7b841408c13fad50be8a2b267936",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "/assets/cards/news.jpg",
+      "url": "https://www.dontlookup.app/assets/cards/news.jpg",
+      "bytes": 45887,
+      "sha256": "da2751bbc2789b1fc70d22f6f4fcba389fabc87b886078345b597bc79b1b6eed",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "/assets/cards/priest.jpg",
+      "url": "https://www.dontlookup.app/assets/cards/priest.jpg",
+      "bytes": 56046,
+      "sha256": "5a48b08c154ac0e5fdaee30c9382056d43ac0397d72bd3df8d88c70ad48ef299",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "/assets/cards/trainer.jpg",
+      "url": "https://www.dontlookup.app/assets/cards/trainer.jpg",
+      "bytes": 50393,
+      "sha256": "a89a9f36d5b44e9066089e6e6124f7ab730d6fb4154461adda686b6861dd42c7",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "/assets/cards/tv.jpg",
+      "url": "https://www.dontlookup.app/assets/cards/tv.jpg",
+      "bytes": 98199,
+      "sha256": "9e6cb0d0b400bb4a8954f0915e72bf639f76d23a86a93e3f94dd5584cbad2fbd",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "/assets/fonts/Marsipan-Regular.woff2",
+      "url": "https://www.dontlookup.app/assets/fonts/Marsipan-Regular.woff2",
+      "bytes": 36012,
+      "sha256": "4e7bed6e8a5ffae5a23b5960ba277296a3363bf7c90dd85439b163f0393f2f29",
+      "type": "font/woff2"
+    },
+    {
+      "path": "/assets/fonts/luckiest-guy-latin-ext.woff2",
+      "url": "https://www.dontlookup.app/assets/fonts/luckiest-guy-latin-ext.woff2",
+      "bytes": 7364,
+      "sha256": "af70abe13304ab70ab2be6213ffe1f623d74b00838faee04e10f5c059ae26945",
+      "type": "font/woff2"
+    },
+    {
+      "path": "/assets/fonts/luckiest-guy-latin.woff2",
+      "url": "https://www.dontlookup.app/assets/fonts/luckiest-guy-latin.woff2",
+      "bytes": 17112,
+      "sha256": "e463777d6d8013e06e5571ffe7c1c401858600d21d5081288337813fb3b94b2e",
+      "type": "font/woff2"
+    },
+    {
+      "path": "/assets/fonts/nunito-latin-ext.woff2",
+      "url": "https://www.dontlookup.app/assets/fonts/nunito-latin-ext.woff2",
+      "bytes": 35464,
+      "sha256": "511ce967375fd2d924483d798f1086a533259fc675181f62944ec1176fe8786d",
+      "type": "font/woff2"
+    },
+    {
+      "path": "/assets/fonts/nunito-latin.woff2",
+      "url": "https://www.dontlookup.app/assets/fonts/nunito-latin.woff2",
+      "bytes": 39152,
+      "sha256": "20fc9b6fc618e7c3c68d3ac750a2a5dfbceb8521675458d2cea580b5693e4798",
+      "type": "font/woff2"
+    },
+    {
+      "path": "/assets/giant.glb",
+      "url": "https://www.dontlookup.app/assets/giant.glb",
+      "bytes": 10730964,
+      "sha256": "276b6383713d0722f0d846aa1c5f6eabdf8b4f767ac351185f57038a8414d25a",
+      "type": "model/gltf-binary"
+    },
+    {
+      "path": "/assets/prop_ball.glb",
+      "url": "https://www.dontlookup.app/assets/prop_ball.glb",
+      "bytes": 314748,
+      "sha256": "f87bb1f093f8f2b77ceffc34b2f5f127d24186f3c83c3413583e0a4f06a8bcba",
+      "type": "model/gltf-binary"
+    },
+    {
+      "path": "/assets/prop_cat.glb",
+      "url": "https://www.dontlookup.app/assets/prop_cat.glb",
+      "bytes": 1424408,
+      "sha256": "11801b031a5a208dd8e1754448359fdf7fcc8e03ee71573ba193cc8f97e53fc2",
+      "type": "model/gltf-binary"
+    },
+    {
+      "path": "/assets/prop_tv.glb",
+      "url": "https://www.dontlookup.app/assets/prop_tv.glb",
+      "bytes": 2152084,
+      "sha256": "d2fd8f269eb7000cfdb061df347c05cfdb2e68ba4209994f2bc9ac6f2587d309",
+      "type": "model/gltf-binary"
+    },
+    {
+      "path": "/assets/steps/believers.jpg",
+      "url": "https://www.dontlookup.app/assets/steps/believers.jpg",
+      "bytes": 67046,
+      "sha256": "e72bf91f7edfb886e3c0a265b6a98f958f39adba83be15923d1353dfc2837bd3",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "/assets/steps/colours.jpg",
+      "url": "https://www.dontlookup.app/assets/steps/colours.jpg",
+      "bytes": 433911,
+      "sha256": "dcea2d67713f459d044e08d73a55b145fb3c99b79bc4ea101f0f585c56686e2c",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "/assets/steps/distract.jpg",
+      "url": "https://www.dontlookup.app/assets/steps/distract.jpg",
+      "bytes": 153074,
+      "sha256": "70226f9a424944a0099669acc814937a99285d1f590e05114f10242584ccc9a6",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "/assets/steps/new_blue.png",
+      "url": "https://www.dontlookup.app/assets/steps/new_blue.png",
+      "bytes": 119770,
+      "sha256": "5e2aed1a03e411358c4ebb2088909f37ee70760654e0d5b24050d70e76c50314",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/steps/new_red.png",
+      "url": "https://www.dontlookup.app/assets/steps/new_red.png",
+      "bytes": 131760,
+      "sha256": "a62fb713475b0f77efd4d9a6c807c53c9252f40614f123b08497b8c74a16d6a7",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/steps/new_yellow.png",
+      "url": "https://www.dontlookup.app/assets/steps/new_yellow.png",
+      "bytes": 114334,
+      "sha256": "a9dc030f8811c12ba31e0ff88cf12dc13d4a42e41037b5b7073f109080c5be72",
+      "type": "image/png"
+    },
+    {
+      "path": "/assets/steps/pay.jpg",
+      "url": "https://www.dontlookup.app/assets/steps/pay.jpg",
+      "bytes": 94779,
+      "sha256": "cfbf33f3dd85e9a6536bc1196a9e45e1c5e3b3e17ce7ddf6dd53fe58719e46e3",
+      "type": "image/jpeg"
+    },
+    {
+      "path": "/assets/steps/up.jpg",
+      "url": "https://www.dontlookup.app/assets/steps/up.jpg",
+      "bytes": 132125,
+      "sha256": "bc540dc264337cecb9a739556b1e4dce5c282aaabfb140c600c374c2751d2d6e",
+      "type": "image/jpeg"
+    }
+  ]
+}
