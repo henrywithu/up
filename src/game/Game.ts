@@ -5,7 +5,7 @@ import { GameAudio } from './Audio';
 export type Phase = 'title' | 'tutorial' | 'playing' | 'won' | 'lost' | 'timeout';
 export interface GameState {
   phase: Phase; money: number; rate: number; elapsed: number; fee: number;
-  ceiling: number; stage: number; drops: number; selected: string | null;
+  ceiling: number; division: number; towersUp: number; stage: number; drops: number; selected: string | null;
   awake: number; recruiting: number; feet: number; paused: boolean;
 }
 export const propOrder = ['ball', 'cat', 'tv', 'dance', 'news', 'coach', 'priest', 'trainer'] as const;
@@ -20,11 +20,13 @@ export class Game {
   readonly audio = new GameAudio();
   readonly world: World;
   state: GameState = { phase: 'title', money: 0, rate: 0, elapsed: 0, fee: 0.05,
-    ceiling: 0.3, stage: 0, drops: 0, selected: null, awake: 2, recruiting: 0, feet: 0, paused: false };
+    ceiling: 0.3, division: 0, towersUp: 0, stage: 0, drops: 0, selected: null, awake: 2, recruiting: 0, feet: 0, paused: false };
   private listeners = new Set<Listener>();
   private noticeClock = 0;
   private publishClock = 0;
   private angerClock = 0;
+  private lastAwake = 2;
+  private lastArguing = 0;
 
   constructor(world: World) {
     this.world = world;
@@ -37,8 +39,10 @@ export class Game {
   async start() {
     this.world.reset();
     this.state = { phase: 'playing', money: 792e6, rate: 0, elapsed: 0, fee: 0.05,
-      ceiling: 0.3, stage: 0, drops: 0, selected: null, awake: 2, recruiting: 0, feet: 0, paused: false };
+      ceiling: 0.3, division: 0, towersUp: 0, stage: 0, drops: 0, selected: null, awake: 2, recruiting: 0, feet: 0, paused: false };
     this.noticeClock = this.publishClock = this.angerClock = 0;
+    this.lastAwake = 2;
+    this.lastArguing = 0;
     this.world.setActive(true);
     this.world.setPaused(false);
     this.emit();
@@ -72,7 +76,7 @@ export class Game {
     const scale = prop.mode === 'influence' ? economy.costScale
       : economy.costScaleFrom + (economy.costScale - economy.costScaleFrom) * smooth;
     const towerIndex = Math.max(0.1, 1 - economy.towerIndex + economy.towerIndex * this.state.fee / economy.towerIndexAt);
-    const towerPrice = towerIndex * (1 + economy.towerEscalate * Math.max(0, this.state.drops - 1));
+    const towerPrice = towerIndex * (1 + economy.towerEscalate * Math.max(0, this.state.towersUp));
     return prop.costSeconds * this.world.citizens.length * economy.perCitizen * scale
       * (prop.mode === 'influence' ? towerPrice : 1);
   }
@@ -85,10 +89,17 @@ export class Game {
     if (this.state.money < cost) return false;
     this.state.money -= cost;
     const prop = CONFIG.props.kinds[kind];
-    this.world.addDrop(kind, x, z, prop.life, prop.capacity);
+    const deck = 'deck' in prop ? prop.deck : [];
+    const headline = deck.length ? deck[this.state.drops % deck.length] : undefined;
+    const title = headline?.title.replace('{group}', 'the hats');
+    const line = headline?.line.replace('{group}', 'the hats');
+    this.world.addDrop(kind, x, z, prop.life, prop.capacity, title, line);
     const changed = this.world.affectNearest(x, z, prop.pull, prop.capacity,
       prop.mode === 'influence' ? 'believing' : prop.mode === 'blame' ? 'arguing' : 'watching');
     this.state.awake = Math.max(0, this.state.awake - changed);
+    if (prop.mode === 'blame') this.state.division += economyDivisionPerBlame();
+    if (prop.mode === 'influence') this.state.towersUp++;
+    this.state.ceiling = Math.min(1, 0.3 + (1 - 0.3) * Math.min(1, this.state.division / 200));
     this.state.drops++;
     this.state.stage = Math.min(3, Math.max(this.state.stage, Math.floor(this.state.drops / 2)));
     this.state.selected = null;
@@ -107,11 +118,20 @@ export class Game {
     const crowd = this.world.snapshot();
     s.awake = crowd.awake;
     s.recruiting = crowd.recruiting;
-    s.feet = this.world.citizens.filter(c => c.state === 'awake' && Math.hypot(c.x, c.z + 26) < 8).length;
+    s.feet = this.world.citizens.filter(c => c.state === 'awake' && Math.hypot(c.x, c.z + 26) < CONFIG.uprising.recruitRadius).length;
+    if (crowd.arguing > this.lastArguing) {
+      s.division += crowd.arguing - this.lastArguing;
+      s.ceiling = Math.min(1, 0.3 + (1 - 0.3) * Math.min(1, s.division / 200));
+    }
+    this.lastArguing = crowd.arguing;
     const pays = CONFIG.economy.pays;
     const weight = this.world.citizens.reduce((sum, citizen) => sum + pays[citizen.state], 0);
     s.rate = s.fee * weight * CONFIG.economy.perCitizen;
     s.money += s.rate * dt;
+    if (s.awake > this.lastAwake) this.audio.notice(s.awake - this.lastAwake);
+    this.lastAwake = s.awake;
+    this.audio.approach(CONFIG.economy.target - s.money);
+    this.audio.countdown(CONFIG.economy.timeLimit - s.elapsed);
     if (this.noticeClock > Math.max(1.8, 4.8 - s.elapsed / 100)) {
       this.noticeClock = 0;
       const candidates = this.world.citizens.filter(c => c.state === 'living' || c.state === 'talking');
@@ -132,12 +152,15 @@ export class Game {
   private end(reason: 'won' | 'lost' | 'timeout') {
     this.state.phase = reason;
     this.world.setPaused(true);
+    if (reason === 'won') this.world.celebrate();
     if (reason === 'lost') this.world.topple();
-    this.audio.end(reason === 'won');
+    this.audio.end(reason);
     this.emit();
   }
   dispose() { this.audio.dispose(); }
 }
+
+function economyDivisionPerBlame() { return 26; }
 
 export function money(value: number) {
   const abs = Math.abs(value);

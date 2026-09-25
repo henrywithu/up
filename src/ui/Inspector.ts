@@ -53,14 +53,18 @@ export class Inspector {
       visible('card-meter', true);
     } else {
       const drop = this.world.drops[nearest.index];
-      const prop = (awaitProp as Record<string, { art: string; mode: string; life: number }>)[drop.kind];
+      const prop = (awaitProp as Record<string, { art: string; mode: string; life: number; pull?: number; capacity?: number }>)[drop.kind];
       if (!prop) { this.hide(); return; }
       el<HTMLImageElement>('card-art').src = prop.art;
       visible('card-art', true);
-      text('card-kicker', prop.mode === 'blame' ? 'somebody is to blame' : prop.mode === 'influence' ? 'somebody to follow' : 'a distraction');
-      text('card-title', drop.kind.replace(/^[a-z]/, c => c.toUpperCase()));
-      text('card-line', 'Keep them looking down.');
-      text('card-note', `${Math.ceil(drop.life)}s left`);
+      const listening = this.world.citizens.filter(c => {
+        const radius = prop.pull ?? 5;
+        return Math.hypot(c.x - drop.x, c.z - drop.z) < radius && c.state === (prop.mode === 'blame' ? 'arguing' : prop.mode === 'influence' ? 'believing' : 'watching');
+      }).length;
+      text('card-kicker', prop.mode === 'blame' ? 'somebody is to blame' : prop.mode === 'influence' ? 'somebody to follow' : prop.mode === 'dance' ? 'everybody is doing this' : 'a distraction');
+      text('card-title', drop.title ?? drop.kind.replace(/^[a-z]/, c => c.toUpperCase()));
+      text('card-line', drop.line ?? 'Keep them looking down.');
+      text('card-note', `${Math.ceil(drop.life)}s left · ${listening} ${prop.mode === 'influence' ? 'converted' : prop.mode === 'blame' ? 'at each other' : 'watching'}`);
       visible('card-note', true);
       visible('card-legend', false);
       el('card-meter').classList.remove('is-staged');

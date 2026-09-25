@@ -17,6 +17,11 @@ export class GameAudio {
   private ambience: { source: AudioBufferSourceNode; gain: GainNode } | null = null;
   private panic: { source: AudioBufferSourceNode; gain: GainNode } | null = null;
   private lastUI = 0;
+  private playing = new Map<Sound, { source: AudioBufferSourceNode; gain: GainNode }>();
+  private lastNotice = 0;
+  private noticeTired = 0;
+  private lastCountdown: number | null = null;
+  private lastApproach: number | null = null;
 
   async unlock() {
     if (!this.context) {
@@ -34,7 +39,7 @@ export class GameAudio {
     await this.context.resume();
   }
 
-  play(sound: Sound, volume = 1, loop = false) {
+  play(sound: Sound, volume = 1, loop = false, when = 0) {
     if (!this.context || !this.master) return null;
     const buffer = this.buffers.get(sound);
     if (!buffer) return null;
@@ -44,8 +49,11 @@ export class GameAudio {
     source.loop = loop;
     gain.gain.value = volume;
     source.connect(gain).connect(this.master);
-    source.start();
-    return { source, gain };
+    source.start(this.context.currentTime + when);
+    const handle = { source, gain };
+    this.playing.set(sound, handle);
+    source.onended = () => { if (this.playing.get(sound) === handle) this.playing.delete(sound); };
+    return handle;
   }
 
   begin() {
@@ -56,10 +64,34 @@ export class GameAudio {
     }
   }
   drop(kind: string) {
-    const sound = kind === 'news' ? 'blameIntro' : kind;
-    if (sound in files) this.play(sound as Sound, CONFIG.audio.drop * (CONFIG.audio.gain as Record<string, number>)[kind]);
-    if (kind === 'priest') setTimeout(() => this.play('priest2'), 1000);
-    if (kind === 'news') setTimeout(() => this.play('blameCrowd', 0.75), 800);
+    const gain = CONFIG.audio.drop * (CONFIG.audio.gain as Record<string, number>)[kind];
+    if (kind === 'news') {
+      const intro = this.play('blameIntro', gain);
+      const delay = Math.max(0, (this.buffers.get('blameIntro')?.duration ?? 0) - CONFIG.audio.blame.overlap);
+      const crowd = this.play('blameCrowd', 0, true, delay);
+      if (crowd && this.context) {
+        const start = this.context.currentTime + delay;
+        crowd.gain.gain.setValueAtTime(0, start);
+        crowd.gain.gain.linearRampToValueAtTime(CONFIG.audio.blame.crowdVolume * CONFIG.audio.drop, start + CONFIG.audio.blame.crowdIn);
+        crowd.gain.gain.setValueAtTime(CONFIG.audio.blame.crowdVolume * CONFIG.audio.drop, start + CONFIG.audio.blame.crowdIn + CONFIG.audio.blame.crowdHold);
+        crowd.gain.gain.linearRampToValueAtTime(0, start + CONFIG.audio.blame.crowdIn + CONFIG.audio.blame.crowdHold + CONFIG.audio.blame.crowdFade);
+        crowd.source.stop(start + CONFIG.audio.blame.crowdIn + CONFIG.audio.blame.crowdHold + CONFIG.audio.blame.crowdFade + 0.1);
+      }
+      return intro;
+    }
+    const sound = kind as Sound;
+    if (sound in files) {
+      const handle = this.play(sound, gain, kind === 'dance');
+      const life = CONFIG.props.kinds[kind as keyof typeof CONFIG.props.kinds]?.life ?? 0;
+      if (handle && this.context && life > CONFIG.audio.loopFade) {
+        const end = this.context.currentTime + life - CONFIG.audio.loopFade;
+        handle.gain.gain.setValueAtTime(gain, end);
+        handle.gain.gain.linearRampToValueAtTime(0, end + CONFIG.audio.loopFade);
+        handle.source.stop(end + CONFIG.audio.loopFade + 0.05);
+      }
+      if (kind === 'priest') this.play('priest2', gain, false, CONFIG.audio.churchGap);
+      return handle;
+    }
   }
   setPanic(on: boolean) {
     if (!this.context) return;
@@ -90,7 +122,47 @@ export class GameAudio {
     oscillator.connect(gain).connect(this.master);
     oscillator.start(now); oscillator.stop(now + 0.1);
   }
-  end(won: boolean) {
+  notice(count: number) {
+    if (!this.context || this.context.state !== 'running' || count <= 0) return;
+    const now = performance.now();
+    if (now - this.lastNotice < CONFIG.audio.notice.minGap) return;
+    const elapsed = (now - this.lastNotice) / 1000;
+    this.lastNotice = now;
+    this.noticeTired *= Math.exp(-elapsed / CONFIG.audio.notice.forget);
+    const volume = Math.max(CONFIG.audio.notice.floor, 1 - this.noticeTired);
+    const chord = Math.min(count, CONFIG.audio.notice.chord);
+    for (let i = 0; i < chord; i++) this.tone(CONFIG.audio.notice.hz * Math.pow(CONFIG.audio.notice.chordStep, i), volume * CONFIG.audio.notice.volume * Math.pow(CONFIG.audio.notice.chordFade, i), CONFIG.audio.notice.attack, CONFIG.audio.notice.decay, i * CONFIG.audio.notice.chordGap, CONFIG.audio.notice.bend);
+    this.noticeTired = Math.min(1, this.noticeTired + CONFIG.audio.notice.fatigue * chord);
+  }
+  countdown(seconds: number) {
+    if (!this.context || this.context.state !== 'running') return;
+    const n = Math.ceil(seconds);
+    if (n > CONFIG.audio.countdown.from || n <= 0 || n === this.lastCountdown) { if (n > CONFIG.audio.countdown.from || n <= 0) this.lastCountdown = null; return; }
+    this.lastCountdown = n;
+    const urgent = n <= CONFIG.audio.countdown.urgentFrom;
+    this.tone(urgent ? CONFIG.audio.countdown.urgentHz : CONFIG.audio.countdown.hz, urgent ? CONFIG.audio.countdown.urgentVolume : CONFIG.audio.countdown.volume, .005, urgent ? .22 : .13);
+  }
+  approach(value: number) {
+    if (!this.context || this.context.state !== 'running' || value <= 0 || value > CONFIG.audio.approach.from) { this.lastApproach = null; return; }
+    const step = Math.ceil(value / CONFIG.audio.approach.step);
+    if (step === this.lastApproach) return;
+    this.lastApproach = step;
+    const index = Math.max(0, Math.round(CONFIG.audio.approach.from / CONFIG.audio.approach.step) - step);
+    this.tone(CONFIG.audio.approach.hz * Math.pow(CONFIG.audio.approach.rise, index), CONFIG.audio.approach.volume, .004, CONFIG.audio.approach.decay);
+  }
+  private tone(frequency: number, volume: number, attack: number, decay: number, when = 0, bend = 0) {
+    if (!this.context || !this.master) return;
+    const at = this.context.currentTime + when;
+    const oscillator = this.context.createOscillator();
+    const gain = this.context.createGain();
+    oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(frequency, at);
+    if (bend) oscillator.frequency.exponentialRampToValueAtTime(frequency * bend, at + attack + decay);
+    gain.gain.setValueAtTime(0, at);
+    gain.gain.linearRampToValueAtTime(volume, at + attack);
+    gain.gain.exponentialRampToValueAtTime(0.0001, at + attack + decay);
+    oscillator.connect(gain).connect(this.master); oscillator.start(at); oscillator.stop(at + attack + decay + .02);
+  }
+  end(reason: 'won' | 'lost' | 'timeout') {
     this.setPanic(false);
     if (this.ambience && this.context) {
       const now = this.context.currentTime;
@@ -98,7 +170,13 @@ export class GameAudio {
       this.ambience.source.stop(now + 1.3);
       this.ambience = null;
     }
-    this.play(won ? 'winMusic' : 'lose', 1);
+    if (reason === 'won') this.play('winMusic', CONFIG.audio.drop * CONFIG.audio.gain.winMusic);
+    else if (reason === 'timeout') this.play('timeout', CONFIG.audio.drop * CONFIG.audio.gain.timeout);
+    else this.play('lose', CONFIG.audio.drop * CONFIG.audio.gain.lose);
   }
-  dispose() { this.ambience?.source.stop(); this.panic?.source.stop(); this.context?.close(); }
+  finalWin() { this.play('winFinal', CONFIG.audio.drop * CONFIG.audio.gain.winFinal); }
+  dispose() {
+    for (const handle of this.playing.values()) { try { handle.source.stop(); } catch {} }
+    this.playing.clear(); this.context?.close(); this.ambience = null; this.panic = null;
+  }
 }

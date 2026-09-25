@@ -6,7 +6,7 @@ import { Puppet, type CitizenState } from './puppet';
 import { outlineGeometry, paperMaterial } from './materials';
 
 export interface CrowdSnapshot { total: number; awake: number; recruiting: number; believers: number; arguing: number }
-export interface Drop { kind: string; x: number; z: number; life: number; capacity: number; age: number; mesh?: THREE.Object3D }
+export interface Drop { kind: string; x: number; z: number; life: number; capacity: number; age: number; title?: string; line?: string; mesh?: THREE.Object3D }
 
 const paper = 0xf4f3ef;
 const ink = 0x14140f;
@@ -30,6 +30,9 @@ export class World {
   private attractionClock = 0;
   private giant: THREE.Group | null = null;
   private toppleTime = -1;
+  private victoryTime = -1;
+  private victoryStart = new THREE.Vector3();
+  private victoryTarget = new THREE.Vector3();
   private readonly puffs: { mesh: THREE.Group; velocity: THREE.Vector3; age: number; life: number }[] = [];
   private readonly cursor: THREE.LineSegments;
   private frame = 0;
@@ -108,6 +111,12 @@ export class World {
     this.active = value;
   }
   setPaused(value: boolean) { this.paused = value; }
+  celebrate() {
+    this.victoryTime = 0;
+    this.victoryStart.copy(this.camera.position);
+    this.victoryTarget.copy(this.controls.target);
+    this.controls.enabled = false;
+  }
 
   private seedCrowd() {
     const count = matchMedia('(pointer: coarse)').matches || innerWidth < 620 ? 26 : 48;
@@ -222,8 +231,8 @@ export class World {
   setCursorPosition(x: number, z: number) { this.cursor.position.set(x, 0, z); }
   setCursorVisible(visible: boolean) { this.cursor.visible = visible; }
 
-  addDrop(kind: string, x: number, z: number, life: number, capacity: number) {
-    const drop: Drop = { kind, x, z, life, capacity, age: 0 };
+  addDrop(kind: string, x: number, z: number, life: number, capacity: number, title?: string, line?: string) {
+    const drop: Drop = { kind, x, z, life, capacity, age: 0, title, line };
     this.drops.push(drop);
     const geo = new THREE.RingGeometry(0.7, 0.75, 48);
     const ring = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: ink, transparent: true, opacity: 0.45, side: THREE.DoubleSide }));
@@ -279,7 +288,7 @@ export class World {
 
   snapshot(): CrowdSnapshot {
     return this.citizens.reduce<CrowdSnapshot>((s, c) => {
-      if (c.state === 'awake') { s.awake++; if (Math.hypot(c.x, c.z + 26) < 15) s.recruiting++; }
+      if (c.state === 'awake') { s.awake++; if (Math.hypot(c.x, c.z + 26) < CONFIG.uprising.recruitRadius) s.recruiting++; }
       if (c.state === 'believing') s.believers++;
       if (c.state === 'arguing') s.arguing++;
       return s;
@@ -297,6 +306,8 @@ export class World {
     for (const drop of this.drops) if (drop.mesh) this.modelGroup.remove(drop.mesh);
     this.drops.length = 0;
     this.toppleTime = -1;
+    this.victoryTime = -1;
+    this.controls.enabled = false;
     if (this.giant) { this.giant.rotation.x = 0; this.giant.rotation.z = 0; }
     for (const puff of this.puffs) this.scene.remove(puff.mesh);
     this.puffs.length = 0;
@@ -360,6 +371,21 @@ export class World {
       const angle = time * intro.spin;
       this.camera.position.set(Math.sin(angle) * distance, height, Math.cos(angle) * distance);
       this.camera.lookAt(0, 1.7, 0);
+    } else if (this.victoryTime >= 0) {
+      this.victoryTime += dt;
+      const t = this.victoryTime;
+      const move = 2.9;
+      const hold = 5.4;
+      const giant = new THREE.Vector3(0, 1.5, -26);
+      const first = Math.min(1, t / move);
+      const firstEase = first * first * (3 - 2 * first);
+      const second = Math.min(1, Math.max(0, (t - move * 0.7) / (move * 0.3 + hold)));
+      const secondEase = second * second * (3 - 2 * second);
+      const angle = Math.atan2(this.victoryStart.x - this.victoryTarget.x, this.victoryStart.z - this.victoryTarget.z) + 0.3 * firstEase;
+      const distance = THREE.MathUtils.lerp(this.victoryStart.distanceTo(this.victoryTarget), 62, firstEase);
+      const height = THREE.MathUtils.lerp(this.victoryStart.y, giant.y + 6.5, firstEase);
+      this.camera.position.set(giant.x + Math.sin(angle) * distance, height, giant.z + Math.cos(angle) * distance);
+      this.camera.lookAt(this.victoryTarget.clone().lerp(giant, secondEase));
     } else if (this.handover < CONFIG.intro.handover) {
       this.handover = Math.min(CONFIG.intro.handover, this.handover + dt);
       const fraction = this.handover / CONFIG.intro.handover;

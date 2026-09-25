@@ -79,6 +79,9 @@ export class Interface {
     this.ended = true;
     if (reason === 'lost') {
       setTimeout(() => { if (this.game.state.phase === reason) this.presentEnd(reason); }, 1800);
+    } else if (reason === 'won') {
+      this.game.audio.finalWin();
+      setTimeout(() => { if (this.game.state.phase === reason) this.presentEnd(reason); }, 8300);
     } else this.presentEnd(reason);
   }
   private presentEnd(reason: 'won' | 'lost' | 'timeout') {
